@@ -1,0 +1,30 @@
+-- method 1
+SELECT 
+  player_id, 
+  device_id 
+FROM   
+  activity 
+WHERE  
+  ( player_id, event_date ) IN (
+    SELECT
+      player_id, 
+      Min(event_date) 
+    FROM
+      activity
+    GROUP  BY 
+      player_id
+   )
+                                     
+-- method 2
+SELECT
+	player_id,
+	device_id
+FROM (
+	 SELECT 
+    player_id,
+	 	device_id,
+	 	event_date,
+	 	MIN(event_date) OVER(PARTITION BY player_id ORDER BY event_date) as first_login
+	 FROM Activity
+ 	) t1
+ WHERE event_date = first_login
